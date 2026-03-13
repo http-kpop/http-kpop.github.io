@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+
+<script>
+  var code = window.location.pathname.replace(/\//g, "");
+  if (/^\d+$/.test(code)) {
+    window.location.replace("/" + code + ".png");
+  } else {
+    window.location.replace("/");
+  }
+</script>
