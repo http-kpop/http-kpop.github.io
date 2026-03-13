@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HTTP K-POP ✦ Status Codes as K-pop Moments</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #06030f;
+      --surface: #0e0820;
+      --card: #120b2a;
+      --accent-pink: #ff2d78;
+      --accent-cyan: #00f0ff;
+      --accent-gold: #ffe156;
+      --accent-lavender: #c084fc;
+      --text: #f0e8ff;
+      --text-muted: #8b7baa;
+      --border: rgba(192, 132, 252, 0.18);
+      --glow-pink: 0 0 30px rgba(255,45,120,0.35);
+      --glow-cyan: 0 0 30px rgba(0,240,255,0.25);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.6;
+    }
+
+    /* Stars background */
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.4); }
+    }
+
+    /* Header */
+    header {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 70px 20px 50px;
+    }
+
+    .site-badge {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: var(--accent-cyan);
+      border: 1px solid var(--accent-cyan);
+      padding: 4px 14px;
+      border-radius: 2px;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      animation: fadeSlideDown 0.6s ease both;
+    }
+
+    h1 {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.8rem, 8vw, 6rem);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      animation: fadeSlideDown 0.7s ease 0.1s both;
+    }
+
+    h1 .http { color: var(--text-muted); font-size: 0.55em; display: block; letter-spacing: 0.1em; margin-bottom: 8px; }
+    h1 .kpop {
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-lavender), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 20px rgba(255,45,120,0.4));
+    }
+
+    .subtitle {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      animation: fadeSlideDown 0.7s ease 0.2s both;
+    }
+    .subtitle .kr { color: var(--accent-lavender); margin-left: 8px; font-family: 'Noto Sans KR', sans-serif; }
+
+    .url-pill {
+      display: inline-block;
+      margin-top: 18px;
+      background: rgba(0,240,255,0.08);
+      border: 1px solid rgba(0,240,255,0.3);
+      border-radius: 4px;
+      padding: 8px 18px;
+      font-size: 13px;
+      color: var(--accent-cyan);
+      letter-spacing: 0.04em;
+      animation: fadeSlideDown 0.7s ease 0.3s both;
+    }
+    .url-pill span { color: var(--accent-pink); font-style: italic; }
+
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Divider */
+    .divider {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 40px;
+      margin: 10px 0 40px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border), transparent);
+    }
+    .divider-icon { color: var(--accent-gold); font-size: 18px; animation: spin 8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Filter tabs */
+    .filters {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 20px 40px;
+    }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      padding: 7px 18px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--accent-pink);
+      color: var(--accent-pink);
+      background: rgba(255,45,120,0.08);
+      box-shadow: var(--glow-pink);
+    }
+    .filter-btn[data-group="2xx"].active { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,0.08); box-shadow: 0 0 20px rgba(74,222,128,0.2); }
+    .filter-btn[data-group="3xx"].active { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0,240,255,0.08); box-shadow: var(--glow-cyan); }
+    .filter-btn[data-group="4xx"].active { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(255,225,86,0.08); }
+    .filter-btn[data-group="5xx"].active { border-color: var(--accent-pink); color: var(--accent-pink); background: rgba(255,45,120,0.08); }
+
+    /* Grid */
+    .grid-wrap {
+      position: relative;
+      z-index: 10;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      margin-top: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), border-color 0.2s, box-shadow 0.2s;
+      animation: cardIn 0.4s ease both;
+    }
+    .card:hover {
+      transform: translateY(-5px) scale(1.02);
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: scale(0.94) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* Image area */
+    .card-img {
+      width: 100%;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0e0820 0%, #1a0a35 100%);
+    }
+
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Styled placeholder shown when no real image exists */
+    .img-placeholder {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+    }
+
+    .img-placeholder .ph-frame {
+      width: 54px;
+      height: 54px;
+      border: 2px dashed var(--card-accent, #c084fc);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+    .card:hover .ph-frame { opacity: 0.9; }
+
+    .img-placeholder .ph-frame svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--card-accent, #c084fc);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .img-placeholder .ph-label {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--card-accent, #c084fc);
+      opacity: 0.4;
+      transition: opacity 0.3s;
+    }
+    .card:hover .ph-label { opacity: 0.8; }
+
+    .img-placeholder .ph-code {
+      position: absolute;
+      bottom: 10px;
+      right: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--card-accent, #c084fc);
+      opacity: 0.25;
+      letter-spacing: 0.05em;
+    }
+
+    /* shimmer on hover */
+    .card-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.06) 50%, transparent 60%);
+      transform: translateX(-100%);
+      transition: transform 0.5s;
+    }
+    .card:hover .card-img::after { transform: translateX(100%); }
+
+    .card-body {
+      padding: 12px 14px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-code {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .card-name {
+      font-size: 10px;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-kr {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 11px;
+      margin-top: 2px;
+      color: var(--accent-lavender);
+      opacity: 0.7;
+    }
+
+    /* Color by group */
+    .card[data-group="2xx"] { --card-accent: #4ade80; }
+    .card[data-group="3xx"] { --card-accent: #00f0ff; }
+    .card[data-group="4xx"] { --card-accent: #ffe156; }
+    .card[data-group="5xx"] { --card-accent: #ff2d78; }
+
+    .card:hover { border-color: var(--card-accent); box-shadow: 0 0 24px color-mix(in srgb, var(--card-accent) 30%, transparent); }
+    .card-code { color: var(--card-accent); }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 40px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+    footer a { color: var(--accent-lavender); text-decoration: none; }
+    footer a:hover { color: var(--accent-pink); }
+    footer .hearts { color: var(--accent-pink); }
+
+    /* Hidden utility */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- Stars -->
+<div class="stars" id="stars"></div>
+
+<header>
+  <div class="site-badge">HTTP STATUS CODES</div>
+  <h1>
+    <span class="http">http://</span>
+    <span class="kpop">K-POP</span>
+  </h1>
+  <p class="subtitle">Every status code as a K-pop moment <span class="kr">✦ 케이팝으로 보는 HTTP</span></p>
+  <div class="url-pill">http-kpop.github.io/<span>[status_code]</span></div>
+</header>
+
+<div class="divider"><span class="divider-icon">✦</span></div>
+
+<div class="filters">
+  <button class="filter-btn active" data-group="all" onclick="filterCards('all', this)">ALL</button>
+  <button class="filter-btn" data-group="1xx" onclick="filterCards('1xx', this)">1xx — INFO</button>
+  <button class="filter-btn" data-group="2xx" onclick="filterCards('2xx', this)">2xx — SUCCESS</button>
+  <button class="filter-btn" data-group="3xx" onclick="filterCards('3xx', this)">3xx — REDIRECT</button>
+  <button class="filter-btn" data-group="4xx" onclick="filterCards('4xx', this)">4xx — CLIENT ERR</button>
+  <button class="filter-btn" data-group="5xx" onclick="filterCards('5xx', this)">5xx — SERVER ERR</button>
+</div>
+
+<div class="grid-wrap" id="mainGrid"></div>
+
+<footer>
+  <p>Inspired by <a href="https://http.cat" target="_blank">http.cat</a> &nbsp;✦&nbsp; Built with <span class="hearts">♥</span> for the fandom &nbsp;✦&nbsp; <a href="https://github.com/r4shsec/http-pop.github.io" target="_blank">GitHub</a></p>
+</footer>
+
+<script>
+const STATUS_CODES = [
+  // 1xx
+  { code: 100, name: "Continue",             group: "1xx", emoji: "🎤", kr: "계속해봐" },
+  { code: 101, name: "Switching Protocols",  group: "1xx", emoji: "🔄", kr: "무대 전환" },
+  { code: 102, name: "Processing",           group: "1xx", emoji: "⏳", kr: "준비 중" },
+  { code: 103, name: "Early Hints",          group: "1xx", emoji: "💌", kr: "예고편" },
+
+  // 2xx
+  { code: 200, name: "OK",                   group: "2xx", emoji: "✨", kr: "완벽해" },
+  { code: 201, name: "Created",              group: "2xx", emoji: "🌟", kr: "데뷔" },
+  { code: 202, name: "Accepted",             group: "2xx", emoji: "💚", kr: "팬 승인" },
+  { code: 204, name: "No Content",           group: "2xx", emoji: "🤫", kr: "침묵" },
+  { code: 206, name: "Partial Content",      group: "2xx", emoji: "🎞️", kr: "티저" },
+
+  // 3xx
+  { code: 301, name: "Moved Permanently",    group: "3xx", emoji: "🛫", kr: "영구 이적" },
+  { code: 302, name: "Found",                group: "3xx", emoji: "🔍", kr: "발견!" },
+  { code: 303, name: "See Other",            group: "3xx", emoji: "👀", kr: "저기 봐" },
+  { code: 304, name: "Not Modified",         group: "3xx", emoji: "💅", kr: "변함없어" },
+  { code: 307, name: "Temp Redirect",        group: "3xx", emoji: "🪄", kr: "잠깐 이동" },
+  { code: 308, name: "Perm Redirect",        group: "3xx", emoji: "✈️", kr: "소속사 이동" },
+
+  // 4xx
+  { code: 400, name: "Bad Request",          group: "4xx", emoji: "😤", kr: "이게 뭐야" },
+  { code: 401, name: "Unauthorized",         group: "4xx", emoji: "🚷", kr: "팬미팅 입장불가" },
+  { code: 403, name: "Forbidden",            group: "4xx", emoji: "🙅", kr: "금지구역" },
+  { code: 404, name: "Not Found",            group: "4xx", emoji: "😢", kr: "사라진 아이돌" },
+  { code: 405, name: "Method Not Allowed",   group: "4xx", emoji: "🚫", kr: "이건 안돼" },
+  { code: 408, name: "Request Timeout",      group: "4xx", emoji: "⏰", kr: "늦었잖아" },
+  { code: 409, name: "Conflict",             group: "4xx", emoji: "🥊", kr: "팬덤 전쟁" },
+  { code: 410, name: "Gone",                 group: "4xx", emoji: "💔", kr: "해체됨" },
+  { code: 418, name: "I'm a Teapot",         group: "4xx", emoji: "🍵", kr: "나는 찻주전자" },
+  { code: 422, name: "Unprocessable",        group: "4xx", emoji: "🤔", kr: "이해불가" },
+  { code: 425, name: "Too Early",            group: "4xx", emoji: "🌅", kr: "아직 일러" },
+  { code: 429, name: "Too Many Requests",    group: "4xx", emoji: "🔥", kr: "서버 터짐" },
+  { code: 451, name: "Unavailable",          group: "4xx", emoji: "⚖️", kr: "법적 차단" },
+
+  // 5xx
+  { code: 500, name: "Internal Server Error",group: "5xx", emoji: "💥", kr: "서버 폭발" },
+  { code: 501, name: "Not Implemented",      group: "5xx", emoji: "🚧", kr: "미완성 앨범" },
+  { code: 502, name: "Bad Gateway",          group: "5xx", emoji: "🌩️", kr: "연결 실패" },
+  { code: 503, name: "Service Unavailable",  group: "5xx", emoji: "🛑", kr: "활동 중단" },
+  { code: 504, name: "Gateway Timeout",      group: "5xx", emoji: "😴", kr: "잠든 서버" },
+  { code: 507, name: "Insufficient Storage", group: "5xx", emoji: "📦", kr: "앨범 꽉 참" },
+];
+
+const SECTION_LABELS = { "1xx": "1xx — 정보 (Informational)", "2xx": "2xx — 성공 (Success)", "3xx": "3xx — 리다이렉션 (Redirection)", "4xx": "4xx — 클라이언트 오류 (Client Error)", "5xx": "5xx — 서버 오류 (Server Error)" };
+
+function makeCard(s) {
+  const a = document.createElement('a');
+  a.href = `/${s.code}`;
+  a.className = 'card';
+  a.dataset.group = s.group;
+  a.style.animationDelay = `${Math.random()*0.25}s`;
+
+  // Check if a real image exists; fallback to emoji
+  const imgSrc = `/${s.code}.png`;
+
+  a.innerHTML = `
+    <div class="card-img">
+      <img src="${imgSrc}" alt="${s.code}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+      <div class="img-placeholder">
+        <div class="ph-frame">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <span class="ph-label">Image Pending</span>
+        <span class="ph-code">${s.code}.png</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-code">${s.code}</div>
+      <div class="card-name">${s.name}</div>
+      <div class="card-kr">${s.kr}</div>
+    </div>
+  `;
+  return a;
+}
+
+function renderGrid(filter = 'all') {
+  const grid = document.getElementById('mainGrid');
+  grid.innerHTML = '';
+  const groups = ['1xx','2xx','3xx','4xx','5xx'];
+
+  groups.forEach(g => {
+    const items = STATUS_CODES.filter(s => s.group === g && (filter === 'all' || filter === g));
+    if (!items.length) return;
+
+    const label = document.createElement('div');
+    label.className = 'section-label';
+    label.textContent = SECTION_LABELS[g];
+    grid.appendChild(label);
+
+    const gridEl = document.createElement('div');
+    gridEl.className = 'status-grid';
+    items.forEach(s => gridEl.appendChild(makeCard(s)));
+    grid.appendChild(gridEl);
+  });
+}
+
+function filterCards(group, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid(group);
+}
+
+// Generate stars
+(function() {
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random()*2 + 0.5;
+    s.style.cssText = `
+      width:${sz}px; height:${sz}px;
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      --d:${2+Math.random()*4}s;
+      --delay:${Math.random()*4}s;
+    `;
+    c.appendChild(s);
+  }
+})();
+
+renderGrid();
+</script>
+</body>
+</html>
