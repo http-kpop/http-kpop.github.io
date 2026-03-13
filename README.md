@@ -10,5 +10,5 @@ http-kpop.github.io/[status_code]
 
 ---
 
-Made by [@r4shsec](https://github.com/r4shsec) 💝 | Licensed under [MIT](https://opensource.org/license/mit)
+Made by [@r4shsec](https://github.com/r4shsec) 💝 | Licensed under [MIT](https://github.com/http-kpop/http-kpop.github.io/blob/main/LICENSE)
 
