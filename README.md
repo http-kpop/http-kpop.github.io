@@ -5,7 +5,7 @@ Hey everyone — This is a Idol-As-A-Service (IAAS) where every HTTP status code
 ## Usage 
 
 ```
-http-kpop.github.io/[status_code]
+http-kpop.github.io/[status_code].png
 ```
 
 ---
